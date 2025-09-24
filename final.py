@@ -57,9 +57,9 @@ try:
     database_client = cosmos_client.get_database_client(COSMOS_DATABASE_NAME)
     logs_container = database_client.get_container_client(LOGS_CONTAINER_NAME)
     occupancy_container = database_client.get_container_client(OCCUPANCY_CONTAINER_NAME)
-    print("✅ Successfully connected to Azure Cosmos DB.")
+    print(" Successfully connected to Azure Cosmos DB.")
 except Exception as e:
-    print(f"❌ ERROR: Could not connect to Cosmos DB. Check your Endpoint and Key. Error: {e}")
+    print(f" ERROR: Could not connect to Cosmos DB. Check your Endpoint and Key. Error: {e}")
     cosmos_client = None
 
 
@@ -77,11 +77,11 @@ def log_event_cosmos(track_id, event_type):
             'timestamp': datetime.utcnow().isoformat() + 'Z' # Use UTC time
         }
         logs_container.create_item(body=log_item)
-        print(f"📄 [COSMOS DB] Logged '{event_type}' for track_id: {track_id}")
+        print(f" [COSMOS DB] Logged '{event_type}' for track_id: {track_id}")
     except exceptions.CosmosHttpResponseError as e:
-        print(f"❌ ERROR logging event to Cosmos DB: {e.message}")
+        print(f" ERROR logging event to Cosmos DB: {e.message}")
     except Exception as e:
-        print(f"❌ An unexpected error occurred while logging event: {e}")
+        print(f" An unexpected error occurred while logging event: {e}")
 
 
 def upsert_occupancy_cosmos(count):
@@ -95,17 +95,17 @@ def upsert_occupancy_cosmos(count):
             'last_updated': datetime.utcnow().isoformat() + 'Z'
         }
         occupancy_container.upsert_item(body=occupancy_item)
-        print(f"📊 [COSMOS DB] Occupancy updated: {count} people")
+        print(f" [COSMOS DB] Occupancy updated: {count} people")
     except exceptions.CosmosHttpResponseError as e:
-        print(f"❌ ERROR upserting occupancy to Cosmos DB: {e.message}")
+        print(f" ERROR upserting occupancy to Cosmos DB: {e.message}")
     except Exception as e:
-        print(f"❌ An unexpected error occurred while upserting occupancy: {e}")
+        print(f" An unexpected error occurred while upserting occupancy: {e}")
 
 
 def upload_video_to_blob(file_path):
     """Uploads the final video summary to Azure Blob Storage."""
     if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
-        print(f"❌ Video file not found or is empty. Skipping upload: {file_path}")
+        print(f" Video file not found or is empty. Skipping upload: {file_path}")
         return
 
     try:
@@ -113,9 +113,9 @@ def upload_video_to_blob(file_path):
         # Create container if it doesn't exist
         try:
             container_client.create_container()
-            print(f"✅ Container '{AZURE_VIDEO_CONTAINER}' created.")
+            print(f" Container '{AZURE_VIDEO_CONTAINER}' created.")
         except Exception:
-            print(f"✅ Container '{AZURE_VIDEO_CONTAINER}' already exists.")
+            print(f" Container '{AZURE_VIDEO_CONTAINER}' already exists.")
 
         blob_name = os.path.basename(file_path)
         blob_client = container_client.get_blob_client(blob_name)
@@ -123,10 +123,10 @@ def upload_video_to_blob(file_path):
         print(f"📤 Uploading {blob_name} to Azure Blob Storage...")
         with open(file_path, "rb") as data:
             blob_client.upload_blob(data, overwrite=True, timeout=120)
-        print(f"✅ Video uploaded successfully: {AZURE_VIDEO_CONTAINER}/{blob_name}")
+        print(f" Video uploaded successfully: {AZURE_VIDEO_CONTAINER}/{blob_name}")
 
     except Exception as e:
-        print(f"❌ FAILED to upload video to Blob Storage: {e}")
+        print(f" FAILED to upload video to Blob Storage: {e}")
 
 
 # ----------------------------- Main Tracking Functions -----------------------------
@@ -140,7 +140,7 @@ def is_nearby(cx, people_inside, prev_cx):
     return any(abs(cx - prev_cx.get(other, cx)) < PROXIMITY_THRESHOLD for other in people_inside)
 
 def main():
-    print("🚀 Starting Occupancy Monitoring System...")
+    print(" Starting Occupancy Monitoring System...")
     
     if not cosmos_client:
         print("Halting execution due to Cosmos DB connection failure.")
